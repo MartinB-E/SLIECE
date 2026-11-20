@@ -14,3 +14,7 @@ Main
 .idea
 *.bin
 *.lie
+
+# Compiled bytecode
+*.cake
+*.gdbc
