@@ -1,62 +1,81 @@
 # SLIECE
 
-**SLIECE** is a minimalist, expression-oriented programming language designed for clarity, purity, and just a little bit of mischief.
+A small, statically typed functional programming language written in Haskell: a compiler to custom bytecode, a stack-based virtual machine, and a decompiler.
 
-Its name comes from the fusion of **slice** (precision, data slicing, computation) and **lie** (elegance, abstraction, and the subtle illusions of programming itself).
+```text
+func fact<Int32 n> => Int32
+func main<> => Int32
 
-SLIECE encourages developers to think *functionally* — every operation returns a value, and functions are the foundation of all computation.  
-Its syntax is compact and readable, making it an ideal environment for both experimentation and structured problem-solving.
+$ fact
+    n <= 1 -> 1
+    -> n * fact (n - 1)
 
-Programs are written in files with the `.lie` extension, and **every program must define a `main` function**, the single entry point where execution begins.
+$ main
+    -> fact 5
+```
 
----
+```console
+$ ./glados-compiler fact.lie
+✅ Compilation Successful! Bytecode written to 'out.cake'
+$ ./glados-vm out.cake
+120
+```
 
-## Philosophy and Design Goals
+## Features
 
-SLIECE is built upon three core principles:
+- **Language**: typed function declarations (`func name<params> => Type`) and definitions (`$ name`), immutable global variables (`define`), recursion, arithmetic, comparison and boolean operators (`&&`, `||`, `!`), and guard-style conditionals (`cond -> value`, with a mandatory final `-> value`)
+- **Types**: `Int8` to `Int64`, `UInt8` to `UInt64`, `Float`, `Double`, `Bool`, `String`
+- **Hand-written parser combinator library** (`Parsing/`) built on `Functor` / `Applicative` / `Alternative` / `Monad` instances, with explicit syntax error messages
+- **Compiler** from source (`.lie`) to a binary bytecode format with a magic header ([bytecode spec](documentation/BytecodeStructure.md))
+- **Virtual machine** that executes the bytecode
+- **Decompiler** that turns bytecode back into readable SLIECE source
+- **Tooling**: unit tests with coverage (`make tests_run`), GitHub Actions CI, Dockerfiles for Ubuntu, Fedora and Arch, and a VS Code syntax-highlighting extension (`vsCodeExtension/`)
 
-### **Simplicity**
-Code should be easy to read, write, and reason about.  
-The syntax is minimal, behavior is predictable, and unnecessary keywords are banished.
+## Tech stack
 
-### **Purity**
-Functions are self-contained and deterministic.  
-No side effects, no surprises — the same input always produces the same output.
+Haskell · Stack · Tasty / HUnit · Docker · GitHub Actions
 
-### **Transparency through Abstraction**
-Abstractions in SLIECE simplify code without sacrificing understanding.  
-Every concept can be broken down into smaller, comprehensible *slices*.
+## Build & run
 
-Together, these principles make SLIECE both a **teaching language** and a **serious tool** for logical and mathematical exploration.
+Requirements: Linux, [Stack](https://docs.haskellstack.org/) and Make. The first build downloads GHC and the dependencies (~10 minutes).
 
----
+```bash
+git clone https://github.com/MartinB-E/SLIECE.git
+cd SLIECE
+make                                # builds glados-compiler, glados-vm and glados-decompiler
 
-## Inspirations and Context
+./glados-compiler fact.lie          # writes out.cake
+./glados-vm out.cake                # prints the value returned by main
+./glados-decompiler out.cake out.lie
+```
 
-SLIECE draws from modern minimalist languages such as **Zig**, **Rust**, and **Python**,  
-but its heart lies closer to **Lisp** and **ML**, emphasizing structure through simplicity.
+Function bodies must be indented under their `$ name` line. The full language guide is in [`Doc/SLIECE - User Guide.pdf`](Doc/).
 
-The `.lie` file extension is a playful nod to *"The cake is a lie"*,  
-a reminder that even elegant syntax hides the machinery beneath.
+## Architecture
 
-But make no mistake — SLIECE rewards **discipline with precision**.  
-By enforcing pure expressions and a clear `main` entry point, it turns constraint into clarity.
+```mermaid
+flowchart LR
+    SRC[".lie source"] --> P["Parser<br/>(parser combinators)"] --> AST[AST] --> C[Compiler] --> BC[".cake bytecode"]
+    BC --> VM["VM<br/>(stack machine)"] --> OUT[result]
+    BC --> D[Decompiler] --> SRC2[".lie source"]
+```
 
----
+- `Parsing/` — generic parser combinator library
+- `compiler/Parser/` — SLIECE grammar: declarations, defines, function bodies, expressions, conditionals
+- `compiler/Compiler.hs`, `BytecodeConvertor.hs` — AST to bytecode
+- `vm/` — bytecode loader and execution loop
+- `decompiler/` — bytecode back to source
 
-## Documentation
+## Context
 
-Further details about SLIECE’s syntax, parsing rules, and internal mechanisms can be found in:
+Epitech 3rd-year project (GLaDOS), September – November 2025, team of 5. The project started as an interpreter and evolved into this compiler + VM.
+This repository is a copy of the team repository [MYAMBO/GLaDOS](https://github.com/MYAMBO/GLaDOS), kept with its full history.
 
-- **`Doc/`** – General documentation and conceptual guides
-- **`documentation/`** – Detailed language specifications
-- **`Parsing/`** – Parser design and grammar implementation
+**Team:** Martin Bonte, Enzo Dubeaurepaire, [Yanis Monté](https://github.com/YanisMonte), [Timoté Koenig](https://github.com/timote1koenig), [Antoine Orange](https://github.com/Antoiix)
 
----
+**My contribution** (most commits of the team, 90 of ~280):
+- Main author of the **SLIECE parser** (`compiler/Parser/`): declarations, `define`, function bodies with multi-line and local variables, expressions with operators and negation, error handling
+- The first version of the interpreter (AST and evaluation), before the move to bytecode
+- Unit tests for the parser
 
-### “Clarity through constraint. Truth through the lie.”
-
----
-
-Designed by Yanis Monté, Martin Bonte, Enzo Dubeaurepaire, Timoté Koenig and Antoine Orange
-
+[À COMPLÉTER : confirmer / corriger ta contribution]
