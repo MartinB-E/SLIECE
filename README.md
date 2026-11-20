@@ -77,5 +77,3 @@ This repository is a copy of the team repository [MYAMBO/GLaDOS](https://github.
 - Main author of the **SLIECE parser** (`compiler/Parser/`): declarations, `define`, function bodies with multi-line and local variables, expressions with operators and negation, error handling
 - The first version of the interpreter (AST and evaluation), before the move to bytecode
 - Unit tests for the parser
-
-[À COMPLÉTER : confirmer / corriger ta contribution]
