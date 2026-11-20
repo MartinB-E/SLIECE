@@ -1,0 +1,9 @@
+func fact<Int32 n> => Int32
+func main<> => Int32
+
+$ fact
+    n <= 1 -> 1
+    -> n * fact (n - 1)
+
+$ main
+    -> fact 5

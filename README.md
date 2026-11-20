@@ -44,7 +44,7 @@ git clone https://github.com/MartinB-E/SLIECE.git
 cd SLIECE
 make                                # builds glados-compiler, glados-vm and glados-decompiler
 
-./glados-compiler fact.lie          # writes out.cake
+./glados-compiler examples/fact.lie  # writes out.cake
 ./glados-vm out.cake                # prints the value returned by main
 ./glados-decompiler out.cake out.lie
 ```

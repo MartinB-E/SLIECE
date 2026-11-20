@@ -18,3 +18,4 @@ Main
 # Compiled bytecode
 *.cake
 *.gdbc
+!examples/*.lie
